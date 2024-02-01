@@ -1,0 +1,1343 @@
+/*
+
+The protocol file is based on this information
+
+public int setHdmiRectangle(int left, int right, int top, int bottom);
+public int enableVideo(int ch, boolean en);
+public int setModuleNum(int ch, int num);
+public int setPortRectangle(int ch, int left, int right, int top, int bottom);
+public int setModuleParam(int ch, int idx, int addr, int x, int y, int w, int h, int rotate);
+public void startScanModuleChain();
+public boolean isScanModuleChain();
+public void stopScanModuleChain();
+public int getPortModules(int ch);
+public ModuleChain getModuleInfoByAddr(int ch, int addr);
+public ModuleChain getModuleInfoByIdx(int ch, int idx);
+*/
+
+//第一行定义的是protobuf中使用的syntax协议，默认情况下是proto2，目前最新的协议是proto3。
+syntax = "proto2";
+
+//这个package是指编译的时候生成文件的包。这是一个命名空间，虽然我们在后面定义了java_package，
+//但是为了和非java语言中的协议相冲突，所以定义package还是非常有必要的。
+package com.xsm.lib.com.proto;
+//指编译过后java文件的个数，如果是true，那么将会一个java对象一个类，如果是false，那么定义的java对象将会被包含在同一个文件中。
+option java_multiple_files = true;
+//指定生成的类应该使用的Java包名称。 如果没有明确的指定，则会使用之前定义的package的值
+option java_package = "com.xsm.lib.com.proto.object";
+//选项定义将表示此文件的包装类的类名。 如果没有给java_outer_classname赋值，它将通过将文件名转换为大写驼峰来生成。
+//例如，默认情况下，“student.proto”将使用"Student"作为包装类名称。
+//option java_outer_classname = "StudentListProtos";
+
+message UserProWrapper
+{
+    required int32 cmd = 1;
+    optional int32 status = 2 [default = 0];
+    optional int32 reqid = 3 [default = 0];
+    optional bytes payload = 4;
+}
+
+enum BluetoothStatus
+{
+    BLS_CONNECTED = 1;
+    BLS_DISCONNECTED = 2;
+    BLS_OTHER = 3;
+}
+
+enum BluetoothMode
+{
+    BLM_OFF = 0;
+    BLM_ON = 1;
+    BLM_START_DISCOVERY = 2;
+    BLM_CANCEL_DISCOVERY = 3;
+}
+
+enum BleutoothOperationResult
+{
+    BLO_SUCCESS = 1;
+    BLO_FAILURE = 2;
+}
+
+enum BleutoothBondState
+{
+    BLB_BONDED = 12;
+    BLB_BONDING = 11;
+    BLB_NONE = 10;
+}
+
+enum WifiMode
+{
+    WM_OFF = 0;
+    WM_ON = 1;
+    WM_START_SCAN = 2;
+    WM_DISCONNECT = 3;
+    WM_CONNECT = 4;
+    WM_UNKNOWN = 5;
+}
+
+enum WifiOperationResult
+{
+    WF_SUCCESS = 1;
+    WF_FAILURE = 2;
+}
+
+enum NetworkOperationResult
+{
+    NW_SUCCESS = 1;
+    NW_INVALID_ADDRESS = 2;
+    NW_INVALID_NETMASK = 3;
+    NW_INVALID_GATEWAY = 4;
+    NW_FAILED = 5;
+}
+
+enum NetworkInterfaceType
+{
+    NT_WIFI = 0;
+    NT_ETH = 1;
+    NT_RNDIS = 2;
+}
+
+enum LedChannel
+{
+//    LC_RED = 0;
+//    LC_BLUE = 1;
+    LC_RED = 0;
+    LC_GREEN = 1;
+    LC_BLUE = 2;
+}
+
+enum LedMode
+{
+    LM_OFF = 0;
+    LM_FLASH = 1;
+    LM_BREATHE = 2;
+    LM_ON = 3;
+}
+
+enum LedOperationResult
+{
+    LO_SUCCESS = 0;
+    LO_INVALID_LOWHIGH = 1;
+}
+
+enum MqttClientState
+{
+    MQTT_UNKNOWN = 0;
+
+    MQTT_CONNECTING = 1;
+    MQTT_CONNECT_LOST = 2;
+    MQTT_CONNECT_SUCCESS = 3;
+    MQTT_CONNECT_FAILURE = 4;
+
+    MQTT_MSG_ARRIVED = 5;
+    MQTT_DELIVERY_COMPLETE = 6;
+    MQTT_PUBLISH_SUCCESS = 7;
+    MQTT_PUBLISH_FAILURE = 8;
+
+    MQTT_SUBSCRIBE_SUCCESS = 9;
+    MQTT_SUBSCRIBE_FAILURE = 10;
+    MQTT_UNSUBSCRIBE_SUCCESS = 11;
+    MQTT_UNSUBSCRIBE_FAILURE = 12;
+}
+
+enum MqttBluetoothState
+{
+    MBT_DISCOVERY_FINISHED = 0;
+    MBT_DISCOVERY_STARTED = 1;
+    MBT_CONNECTED = 2;
+    MBT_CONNECTING = 3;
+    MBT_DISCONNECTED = 4;
+    MBT_DISCONNECTING = 5;
+    MBT_BOND_NONE = 6;
+    MBT_BOND_BONDING = 7;
+    MBT_BOND_BONDED = 8;
+    MBT_ON = 9;
+    MBT_OFF = 10;
+}
+
+enum MqttBleGattMsgType
+{
+    GATT_UNKNOWN = 0;
+    GATT_CHARACTERISTIC_READ = 1;
+    GATT_CHARACTERISTIC_WRITE = 2;
+    GATT_DESCRIPTOR_READ = 3;
+    GATT_DESCRIPTOR_WRITE = 4;
+    GATT_NOTIFY_CHANGED = 5;
+}
+
+enum GattServerInitState
+{
+    GATT_INIT_UNKNOWN = 0;
+    GATT_INIT_START = 1;
+    GATT_INIT_BROADCAST = 2;
+    GATT_INIT_SUCCEED = 3;
+}
+
+enum DeviceUpdateState
+{
+    UPDATE_STA_UNKNOWN = 0;
+    UPDATE_STA_SUCCESS = 1;
+    UPDATE_STA_ERR_NO_FILE = 2;
+    UPDATE_STA_ERR_ERASE = 3;
+    UPDATE_STA_ERR_PROGRAM= 4;
+    UPDATE_STA_ERR_CHECK = 5;
+}
+
+enum DeviceUpdateStep
+{
+    UPDATE_STEP_UNKNOWN = 0;
+    UPDATE_STEP_START = 1;
+    UPDATE_STEP_ERASE = 2;
+    UPDATE_STEP_PROGRAM = 3;
+    UPDATE_STEP_CHECK = 4;
+    UPDATE_STEP_DONE = 5;
+}
+
+enum WifiStatus
+{
+    //this is the network we are currently connected to
+    WIFI_STATUS_CURRENT = 0;
+    //supplicant will not attempt to use this network
+    WIFI_STATUS_DISABLED = 1;
+    //supplicant will consider this network available for association
+    WIFI_STATUS_ENABLED = 2;
+}
+
+enum WifiAuthAlgorithm
+{
+    //Open System authentication (required for WPA/WPA2)
+    WIFI_AUTH_OPEN = 0;
+    //Shared Key authentication (requires static WEP keys)
+    //Deprecated Due to security and performance limitations, use of WEP networks is discouraged
+    WIFI_AUTH_SHARED = 1;
+    //LEAP/Network EAP (only used with LEAP)
+    WIFI_AUTH_LEAP = 2;
+}
+
+enum WifiGroupCipher
+{
+    //WEP40 = WEP (Wired Equivalent Privacy) with 40-bit key (original 802.11)
+    //Deprecated Due to security and performance limitations, use of WEP networks is discouraged.
+    WIFI_GROUP_WEP40 = 0;
+    //WEP104 = WEP (Wired Equivalent Privacy) with 104-bit key
+    //Deprecated Due to security and performance limitations, use of WEP networks is discouraged.
+    WIFI_GROUP_WEP104 = 1;
+    //Temporal Key Integrity Protocol [IEEE 802.11i/D7.0]
+    WIFI_GROUP_TKIP = 2;
+    //AES in Counter mode with CBC-MAC [RFC 3610, IEEE 802.11i/D7.0]
+    WIFI_GROUP_CCMP = 3;
+    //Hotspot 2.0 r2 OSEN
+    WIFI_GROUP_GTK_NOT_USED = 4;
+    //AES in Galois/Counter Mode
+    WIFI_GROUP_GCMP_256 = 5;
+}
+
+enum WifiPairwiseCipher
+{
+    //Use only Group keys (deprecated)
+    WIFI_PAIRWISE_NONE = 0;
+    //Temporal Key Integrity Protocol [IEEE 802.11i/D7.0]
+    //Deprecated Due to security and performance limitations, use of WPA-1 networks is discouraged. WPA-2 (RSN) should be used instead.
+    WIFI_PAIRWISE_TKIP = 1;
+    //AES in Counter mode with CBC-MAC [RFC 3610, IEEE 802.11i/D7.0]
+    WIFI_PAIRWISE_CCMP = 2;
+    //AES in Galois/Counter Mode
+    WIFI_PAIRWISE_GCMP_256 = 3;
+}
+
+enum WifiKeyMgmt
+{
+    //WPA is not used; plaintext or static WEP could be used.
+    WIFI_KEY_NONE = 0;
+    //WPA pre-shared key (requires preSharedKey to be specified).
+    WIFI_KEY_WPA_PSK = 1;
+    //WPA using EAP authentication. Generally used with an external authentication server.
+    WIFI_KEY_WPA_EAP = 2;
+    //IEEE 802.1X using EAP authentication and (optionally) dynamically generated WEP keys.
+    WIFI_KEY_IEEE8021X = 3;
+    //WPA2 pre-shared key for use with soft access point (requires preSharedKey to be specified).
+    WIFI_KEY_WPA2_PSK = 4;
+    //Hotspot 2.0 r2 OSEN:
+    WIFI_KEY_OSEN= 5;
+    //IEEE 802.11r Fast BSS Transition with PSK authentication.
+    WIFI_KEY_FT_PSK = 6;
+    //IEEE 802.11r Fast BSS Transition with EAP authentication.
+    WIFI_KEY_FT_EAP = 7;
+    //Simultaneous Authentication of Equals
+    WIFI_KEY_SAE = 8;
+    //Opportunististic Wireless Encryption
+    WIFI_KEY_OWE = 9;
+    //SUITE_B_192 192 bit level
+    WIFI_KEY_SUITE_B_192 = 10;
+    //WPA pre-shared key with stronger SHA256-based algorithms.
+    WIFI_KEY_WPA_PSK_SHA256 = 11;
+    //WPA using EAP authentication with stronger SHA256-based algorithms.
+    WIFI_KEY_WPA_EAP_SHA256 = 12;
+}
+
+enum WifiProtocol
+{
+    //WPA/IEEE 802.11i/D3.0
+    //Deprecated Due to security and performance limitations, use of WPA-1 networks is discouraged. WPA-2 (RSN) should be used instead.
+    WIFI_PROTOCOL_WPA = 0;
+    //RSN WPA2/WPA3/IEEE 802.11i
+    WIFI_PROTOCOL_RSN = 1;
+    //HS2.0 r2 OSEN
+    WIFI_PROTOCOL_OSEN = 2;
+}
+
+enum WifiApStatus
+{
+    WIFI_AP_STATE_DISABLING = 10;
+    WIFI_AP_STATE_DISABLED = 11;
+    WIFI_AP_STATE_ENABLING = 12;
+    WIFI_AP_STATE_ENABLED = 13;
+    WIFI_AP_STATE_FAILED = 14;
+}
+
+message NetworkConfiguration
+{
+    optional bool use_dhcp = 1 [default = false];
+    optional string address = 2 [default = ""];
+    optional string subnet_mask = 3 [default = ""];
+    optional string gateway = 4 [default = ""];
+    optional string dns1 = 5 [default = ""];
+    optional string dns2 = 6 [default = ""];
+}
+
+message NetworkInterface
+{
+    required string name = 1;
+    optional bool is_available = 2 [default = false];
+    optional bool is_connected = 3 [default = false];
+    optional string ssid = 4 [default = ""];
+    optional string mac = 5 [default = ""];
+    optional int32 speed = 6 [default = 0];
+    optional int32 rssi = 7 [default = 0];
+    optional int32 netid = 8 [default = 0];
+    optional NetworkConfiguration configuration = 9;
+    optional NetworkInterfaceType interface_type = 10 [default = NT_WIFI];
+}
+
+message LimitedWifiInterfaceInfo
+{
+    optional string ssid = 1 [default = ""];
+    optional int32 netid = 2 [default = 0];
+    optional int32 status = 3 [default = 0];
+}
+
+//UserProPacket
+message ProtocolContainer
+{
+    required int32 cmd = 1;
+    optional int32 status = 2;
+    optional int32 pid = 3;
+    optional bytes payload = 4;
+}
+
+message ModuleChain
+{
+    optional int32 address = 1 [default = 0];
+    optional int32 rx_connect = 2 [default = 0];
+    optional int32 tx_connect0 = 3 [default = 0];
+    optional ModuleChain next0 = 4;
+    optional int32 tx_connect1 = 5 [default = 0];
+    optional ModuleChain next1 = 6;
+    optional int32 tx_connect2 = 7 [default = 0];
+    optional ModuleChain next2 = 8;
+}
+
+message BluetoothDevice
+{
+    optional string address = 1;
+    optional string name = 2;
+    optional string uuid = 3;
+    optional BluetoothStatus status = 4;
+    optional BleutoothBondState bond_state = 5 [default = BLB_NONE];
+}
+
+message WifiNetwork
+{
+    required string ssid = 1;
+    optional string capabilities = 2 [default = ""];
+    optional int32 signal_strength = 3 [default = 0];
+}
+
+message SenderParamEntry
+{
+    optional int32 addr = 1 [default = 0];
+    optional int32 length = 2 [default = 0];
+    optional bytes data = 3;
+}
+
+message MqttBluetoothExtraDevice
+{
+    optional string pin = 1 [default = ""];
+    optional BluetoothDevice device = 2;
+}
+
+message MqttBluetoothActtionFound
+{
+    optional BluetoothDevice device = 1;
+}
+
+message MqttBluetoothStateChange
+{
+    optional MqttBluetoothState status = 1;
+    optional BluetoothDevice device = 2;
+}
+
+//User request received from Bluetooth
+message MqttBleGattRequest
+{
+    optional BluetoothDevice device = 1;
+    optional MqttBleGattMsgType msg_type = 2 [default = GATT_UNKNOWN];
+    optional int32 request_id = 3 [default = 0];
+    optional int32 offset = 4 [default = 0];
+    optional bytes data = 5;
+}
+
+//The data packet that the foreground application returns to the background service to return to the user
+message MqttBleGattResponse
+{
+    optional bool result = 1 [default = true];
+    optional BluetoothDevice device = 2;
+    optional MqttBleGattMsgType msg_type = 3 [default = GATT_UNKNOWN];
+    optional int32 request_id = 4 [default = 0];
+    optional int32 offset = 5 [default = 0];
+    optional bytes data = 6;
+}
+
+//PID: 64
+message UartWriteRequest
+{
+    required int32 channel = 1;
+    optional bytes data = 2;
+}
+
+//PID: 65
+message UartWriteResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 66
+message UartReadRequest
+{
+    required int32 channel = 1;
+    optional int32 req_lenght = 2 [default = 4096];
+}
+
+//PID: 67
+message UartReadResponse
+{
+    optional bytes data = 1;
+}
+
+//PID: 68
+message UartConversationRequest
+{
+    required int32 channel = 1;
+    optional bytes data = 2;
+    optional int32 read_lenght = 3 [default = 4096];
+}
+
+//PID: 69
+message UartConversationResponse
+{
+    optional bool result = 1 [default = true];
+    optional bytes data = 2;
+}
+
+//PID: 70
+message SenderSetParamsRequest
+{
+    required int32 channel = 1;
+    repeated SenderParamEntry entry = 2;
+}
+
+//PID: 71
+message SenderSetParamsResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 72
+message SenderGetParamsRequest
+{
+    repeated SenderParamEntry entry = 2;
+}
+
+//PID: 73
+message SenderGetParamsResponse
+{
+    optional bool result = 1 [default = true];
+    repeated SenderParamEntry entry = 2;
+}
+
+//PID: 74
+message SenderSendRawToSlaveRequest
+{
+    required int32 channel = 1;
+    optional bytes data = 2;
+    optional bool is_en_recv = 3;
+}
+
+//PID: 75
+message SenderSendRawToSlaveResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 76
+message SenderRecvRawToSlaveRequest
+{
+    required int32 channel = 1;
+}
+
+//PID: 77
+message SenderRecvRawToSlaveResponse
+{
+    optional bytes data = 2;
+}
+
+//PID: 100
+message ResetHostRequest
+{
+    //This message has no payload
+}
+
+//PID: 101
+message ResetHostResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+////PID: 101
+//message GeneralOperationResponse
+//{
+//    optional bool result = 1 [default = true];
+//}
+
+//PID: 102
+message SetHdmiRectangleRequest
+{
+    optional int32 left = 1 [default = 0];
+    optional int32 right = 2 [default = 1920];
+    optional int32 top = 3 [default = 0];
+    optional int32 bottom = 4 [default = 1080];
+}
+
+//PID: 103
+message SetHdmiRectangleResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 104
+message EnableVideoRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional bool enabled = 2 [default = false];
+}
+
+//PID: 105
+message EnableVideoResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 106
+message SetNumberOfModulesRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 count = 2 [default = 0];
+}
+
+//PID: 107
+message SetNumberOfModulesResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 108
+message SetPortRectangleRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 left = 2 [default = 0];
+    optional int32 right = 3 [default = 0];
+    optional int32 top = 4 [default = 0];
+    optional int32 bottom = 5 [default = 1080];
+}
+
+//PID: 109
+message SetPortRectangleResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 110
+message SetModuleParametersRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 index = 2 [default = 0];
+    optional int32 address = 3 [default = 0];
+    optional int32 x = 4 [default = 0];
+    optional int32 y = 5 [default = 0];
+    optional int32 width = 6 [default = 0];
+    optional int32 height = 7 [default = 0];
+    optional int32 rotation = 8 [default = 0];
+}
+
+//PID: 111
+message SetModuleParametersResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 112
+message StartScanModuleChainRequest
+{
+    optional bool enabled = 1 [default = false];
+    optional int32 x = 2 [default = 0];
+    optional int32 y = 3 [default = 0];
+    optional int32 width = 4 [default = 8];
+    optional int32 height = 5 [default = 8];
+    optional int32 channel_mask = 6 [default = 0x0000000f];
+}
+
+//PID: 113
+message StartScanModuleChainResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 114
+message IsScanModuleChainActiveRequest
+{
+    //This message has no payload
+}
+
+//PID: 115
+message IsScanModuleChainActiveResponse
+{
+    optional bool is_running = 1 [default = false];
+}
+
+//PID: 116
+message StopScanModuleChainRequest
+{
+    optional bool enabled = 1 [default = false];
+}
+
+//PID: 117
+message StopScanModuleChainResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 118
+message GetPortModulesRequest
+{
+    optional int32 channel = 1 [default = 0];
+}
+
+//PID: 119
+message GetPortModulesResponse
+{
+    optional int32 count = 1 [default = 0];
+}
+
+//PID: 120
+message GetModuleInfoByAddressRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 address = 2 [default = 0];
+}
+
+//PID: 121
+message GetModuleInfoByAddressResponse
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 address = 2 [default = 0];
+    optional int32 host_port = 3 [default = 0];
+    optional int32 connect0 = 4 [default = 0];
+    optional int32 next_address_0 = 5 [default = 0];
+    optional int32 connect1 = 6 [default = 0];
+    optional int32 next_address_1 = 7 [default = 0];
+    optional int32 connect2 = 8 [default = 0];
+    optional int32 next_address_2 = 9 [default = 0];
+    optional int32 connect3 = 10 [default = 0];
+    optional int32 next_address_3 = 11 [default = 0];
+    optional bytes route_address = 12;
+    optional int32 x = 13 [default = 0];
+    optional int32 y = 14 [default = 0];
+    optional int32 width = 15 [default = 8];
+    optional int32 height = 16 [default = 8];
+}
+
+//PID: 122
+message GetModuleInfoByIndexRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 index = 2 [default = 0];
+}
+
+//PID: 123
+message GetModuleInfoByIndexResponse
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 address = 2 [default = 0];
+    optional int32 host_port = 3 [default = 0];
+    optional int32 connect0 = 4 [default = 0];
+    optional int32 next_address_0 = 5 [default = 0];
+    optional int32 connect1 = 6 [default = 0];
+    optional int32 next_address_1 = 7 [default = 0];
+    optional int32 connect2 = 8 [default = 0];
+    optional int32 next_address_2 = 9 [default = 0];
+    optional int32 connect3 = 10 [default = 0];
+    optional int32 next_address_3 = 11 [default = 0];
+    optional bytes route_address = 12;
+    optional int32 x = 13 [default = 0];
+    optional int32 y = 14 [default = 0];
+    optional int32 width = 15 [default = 8];
+    optional int32 height = 16 [default = 8];
+}
+
+//PID: 124
+message GetModuleParametersRequest
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 index = 2 [default = 0];
+}
+
+//PID: 125
+message GetModuleParametersResponse
+{
+    optional int32 channel = 1 [default = 0];
+    optional int32 index = 2 [default = 0];
+    optional int32 address = 3 [default = 0];
+    optional int32 x = 4 [default = 0];
+    optional int32 y = 5 [default = 0];
+    optional int32 width = 6 [default = 0];
+    optional int32 height = 7 [default = 0];
+    optional int32 rotation = 8 [default = 0];
+}
+
+//PID: 126
+message ConfigureLedRequest
+{
+    optional LedChannel channel = 1 [default = LC_RED];
+    optional LedMode mode = 2 [default = LM_OFF];
+    optional int32 low = 3 [default = 250];
+    optional int32 high = 4 [default = 250];
+}
+
+//PID: 127
+message ConfigureLedResponse
+{
+    optional LedOperationResult result = 1 [default = LO_SUCCESS];
+}
+
+//PID: 128
+message SysExecCmdRequest
+{
+    optional bool is_su = 1 [default = false];
+    optional string cmd = 2 [default = ""];
+}
+
+//PID: 129
+message SysExecCmdResponse
+{
+    optional int32 exit_status = 1 [default = 0];
+    repeated string result = 2;
+}
+
+
+//PID: 132
+message SetBluetoothModeRequest
+{
+    optional BluetoothMode mode = 1 [default = BLM_OFF];
+    optional string name = 2 [default = "CECO_APP"];
+}
+
+//PID: 133
+message SetBluetoothModeResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 134
+message GetBluetoothStatusRequest
+{
+    //This message has no payload
+}
+
+//PID: 135
+message GetBluetoothStatusResponse
+{
+    optional BluetoothMode mode = 1 [default = BLM_OFF];
+    optional BluetoothStatus status = 2 [default = BLS_DISCONNECTED];
+}
+
+//PID: 136
+message GetBluetoothClientDevicesRequest
+{
+    //This message has no payload
+}
+
+//PID: 137
+message GetBluetoothClientDevicesResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+    repeated BluetoothDevice bluetooth_devices = 2;
+}
+
+//PID: 138
+message GetBluetoothBoundedClientDevicesRequest
+{
+    //This message has no payload
+}
+
+//PID: 139
+message GetBluetoothBoundedClientDevicesResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+    repeated BluetoothDevice bluetooth_devices = 2;
+}
+
+//PID: 140
+message BluetoothBindClientDeviceRequest
+{
+    required string address = 1;
+    optional string pin = 2 [default = ""];
+}
+
+//PID: 141
+message BluetoothBindClientDeviceResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 142
+message BluetoothUnBindClientDeviceRequest
+{
+    optional string address = 1 [default = ""];
+    optional bool clear_all = 2 [default = false];
+}
+
+//PID: 143
+message BluetoothUnBindClientDeviceResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 144
+message BluetoothStartCommunicationsRequest
+{
+    required string addres = 1;
+}
+
+//PID: 145
+message BluetoothStartCommunicationsResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 146
+message BluetoothStopCommunicationsRequest
+{
+    //This message has no payload
+}
+
+//PID: 147
+message BluetoothStopCommunicationsResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 148
+message BluetoothWriteRequest
+{
+    optional bytes data = 1;
+}
+
+//PID: 149
+message BluetoothWriteResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+}
+
+//PID: 150
+message BluetoothReadRequest
+{
+    //This message has no payload
+}
+
+//PID: 151
+message BluetoothReadResponse
+{
+    optional bytes data = 1;
+}
+
+//PID: 152
+message BluetoothGetCurrentClientDeviceRequest
+{
+    //This message has no payload
+}
+
+//PID: 153
+message BluetoothGetCurrentClientDeviceResponse
+{
+    optional BleutoothOperationResult result = 1 [default = BLO_SUCCESS];
+    repeated BluetoothDevice bluetooth_devices = 2;
+}
+
+//PID: 164
+message WifiConfigureRequest
+{
+    optional WifiMode mode = 1 [default = WM_OFF];
+    optional int32 net_id = 2 [default = 0];
+}
+
+//PID: 165
+message WifiConfigureResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+}
+
+//PID: 166
+message WifiGetStatusRequest
+{
+
+}
+
+//PID: 167
+message WifiGetStatusResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+    optional WifiMode mode = 2 [default = WM_OFF];
+    //optional int32 state = 2 [default = 0]; I feel this could be part of WifiMode
+}
+
+//PID: 168
+message WifiGetNetworksRequest
+{
+    //This message has no payload
+}
+
+//PID: 169
+message WifiGetNetworksResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+    repeated WifiNetwork wifi_networks = 2;
+}
+
+//PID: 170
+message WifiConnectToNetworkRequest
+{
+    required string ssid = 1;
+    optional string password = 2 [default = ""];
+}
+
+//PID: 171
+message WifiConnectToNetworkResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+}
+
+//PID: 172
+message GetNetworkInterfacesRequest
+{
+    //This message has no payload
+}
+
+//PID: 173
+message GetNetworkInterfacesResponse
+{
+    repeated NetworkInterface network_interfaces = 1;
+}
+
+//PID: 174
+message ConfigureNetworkInterfaceRequest
+{
+    required string interface_name = 1;
+    required NetworkConfiguration configuration = 2;
+}
+
+//PID: 175
+message ConfigureNetworkInterfaceResponse
+{
+    optional NetworkOperationResult result = 1 [default = NW_SUCCESS];
+}
+
+//PID: 176
+message WifiGetApConfigurationListRequest
+{
+    //This message has no payload
+}
+
+//PID: 177
+message WifiGetApConfigurationListResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+    repeated LimitedWifiInterfaceInfo wifi_network_infos = 2;
+}
+
+//PID: 178
+message GetFirmwareVersionsRequest
+{
+    //No payload
+}
+
+//PID: 179
+message GetFirmwareVersionsResponse
+{
+    //All versions should be <= 65535
+    optional int32 bsp_version = 1 [default = 1];
+    optional int32 multifunctionmonitor_version = 2 [default = 1];
+    optional string multifunctionmonitor_info = 3 [default = ""];
+    optional int32 driver_version = 4 [default = 1];
+}
+
+//PID: 180
+message ConfigureDiyLedRequest
+{
+    optional LedChannel channel = 1 [default = LC_RED];
+    optional LedMode mode = 2 [default = LM_OFF];
+    optional double pwm = 3 [default = 50.00];
+    optional int32 delay_ms = 4 [default = 500];
+}
+
+//PID: 181
+message ConfigureDiyLedResponse
+{
+    optional LedOperationResult result = 1 [default = LO_SUCCESS];
+}
+
+//PID: 200
+message MqttClientOpenRequest
+{
+    optional string host_address = 1 [ default = "127.0.0.1"];
+    optional int32 host_port = 2 [default = 32726];
+    optional string client_id = 3 [default = "multifunctionmonitor"];
+    optional string user_name = 4 [default = ""];
+    optional string password = 5 [default = ""];
+    repeated string subscription_topics = 6;
+}
+
+//PID: 201
+message MqttClientOpenResponse
+{
+    optional bool success = 1 [default = true];
+}
+
+//PID: 202
+message MqttClientSubscribeRequest
+{
+    required bool is_clear = 1;
+    repeated string topic = 2;
+}
+
+//PID: 203
+message MqttClientSubscribeResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 204
+message MqttClientUnSubscribeRequest
+{
+    required bool is_all = 1;
+    repeated string topic = 2;
+}
+
+//PID: 205
+message MqttClientUnSubscribeResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 206
+message MqttClientPublishRequest
+{
+    required string toppic = 1;
+    optional bytes data = 2;
+}
+
+//PID: 207
+message MqttClientPublishResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 208
+message MqttClientStatusRequest
+{
+    //This message has no payload
+}
+
+//PID: 209
+message MqttClientStatusResponse
+{
+    optional bool is_busy = 1 [default = false];
+    optional bool is_failure = 2 [default = false];
+    optional MqttClientState status = 3 [default = MQTT_UNKNOWN];
+}
+
+//PID: 210
+message MqttClientTopicBroadcastRequest
+{
+    optional string bt_extra_device_topic = 1 [default = ""];
+    optional string bt_action_found_topic = 2 [default = ""];
+    optional string bt_state_change_topic = 3 [default = ""];
+}
+
+//PID: 211
+message MqttClientTopicBroadcastResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 212
+message MqttGattServerStartRequest
+{
+    optional string uuid_server = 1 [default = "4345434F-2550-42a3-b733-69563d639ef4"];
+//    optional string uuid_char_write = 2 [default = "5245434F-2550-42a3-b733-69563d639ef4"];
+//    optional string uuid_char_read = 3 [default = "5745434F-2550-42a3-b733-69563d639ef4"];
+    optional string uuid_char_write = 2 [default = "5745434F-2550-42a3-b733-69563d639ef4"];
+    optional string uuid_char_read = 3 [default = "5245434F-2550-42a3-b733-69563d639ef4"];
+    optional string uuid_char_notify = 4 [default = "4E45434F-2550-42a3-b733-69563d639ef4"];
+    optional string uuid_descriptor = 5 [default = "4445434F-2550-42a3-b733-69563d639ef4"];
+    optional bytes advertise_data = 6; //max 24byte
+    optional bytes scan_response_data = 7; //max 27byte
+    optional string mqtt_host_address = 8 [default = "127.0.0.1"];
+    optional int32 mqtt_host_port = 9 [default = 32726];
+    optional string mqtt_name = 10 [default = ""];
+    optional string mqtt_password = 11 [default = ""];
+    optional int32 advertise_manufacturer_id = 12 [default = 65535];    //0xFFFF = SIG appointed value for testing
+    optional int32 scan_response_manufacturer_id = 13 [default = 65535]; //0xFFFF = SIG appointed value for testing
+    optional bool include_tx_power_level = 14 [default = false];
+    optional bool include_device_name = 15 [default = false];
+}
+
+//PID: 213
+message MqttGattServerStartResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 214
+message MqttGattServerStopRequest
+{
+    optional string uuid_server = 1 [default = ""];
+}
+
+//PID: 215
+message MqttGattServerStopResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 216
+message MqttGattServerStatusRequest
+{
+    optional string uuid_server = 1 [default = ""];
+}
+
+//PID: 217
+message MqttGattServerStatusResponse
+{
+    optional GattServerInitState status = 1 [default = GATT_INIT_UNKNOWN];
+}
+
+//PID: 218
+message WifiQuickConnectApRequest
+{
+    required string ssid = 1;
+    optional string password = 2 [default = ""];
+    optional bool hidden_ssid = 3 [default = true];
+    optional WifiStatus status = 4 [default = WIFI_STATUS_ENABLED];
+    repeated WifiAuthAlgorithm auth_algorithms = 5;
+    repeated WifiGroupCipher group_ciphers = 6;
+    repeated WifiPairwiseCipher pairwise_ciphers = 7;
+    repeated WifiKeyMgmt key_mgmts = 8;
+    repeated WifiProtocol protocols = 9;
+}
+
+//PID: 219
+message WifiQuickConnectApResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+}
+
+//PID: 220
+message FpgaUpdateRequest
+{
+    optional string file_name = 1 [default = "/mnt/sdcard/Documents/UPDATE.BIN"];
+}
+
+//PID: 221
+message FpgaUpdateResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 222
+message FpgaUpdateStatusRequest
+{
+    //This message has no payload
+}
+
+//PID: 223
+message FpgaUpdateStatusResponse
+{
+    optional DeviceUpdateState state = 1 [default = UPDATE_STA_UNKNOWN];
+    optional DeviceUpdateStep step = 2 [default = UPDATE_STEP_UNKNOWN];
+}
+
+//PID: 224
+message ApkUpdateRequest
+{
+    optional string file_name = 1 [default = "/mnt/sdcard/Documents/Update.apk"];
+    optional string package_name = 2 [default = "com.xsm.exa.multifunctionmonitoring"];
+}
+
+//PID: 225
+message ApkUpdateResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 226
+message WifiStartSoftApRequest
+{
+    required string ssid = 1;
+    optional string password = 2 [default = ""];
+    optional bool hidden_ssid = 3 [default = false];
+    optional WifiStatus status = 4 [default = WIFI_STATUS_ENABLED];
+    repeated WifiAuthAlgorithm auth_algorithms = 5;
+    repeated WifiGroupCipher group_ciphers = 6;
+    repeated WifiPairwiseCipher pairwise_ciphers = 7;
+    repeated WifiKeyMgmt key_mgmts = 8;
+    repeated WifiProtocol protocols = 9;
+}
+
+//PID: 227
+message WifiStartSoftApResponse
+{
+    optional WifiOperationResult result = 1 [default = WF_SUCCESS];
+}
+
+//PID: 228
+message WifiGetSoftApStateRequest
+{
+    //This message has no payload
+}
+
+//PID: 229
+message WifiGetSoftApStateResponse
+{
+    optional WifiApStatus state = 1 [default = WIFI_AP_STATE_DISABLED];
+    optional string ssid = 2;
+    optional string password = 3 [default = ""];
+    optional bool hidden_ssid = 4 [default = false];
+    optional WifiStatus status = 5 [default = WIFI_STATUS_ENABLED];
+    repeated WifiAuthAlgorithm auth_algorithms = 6;
+    repeated WifiGroupCipher group_ciphers = 7;
+    repeated WifiPairwiseCipher pairwise_ciphers = 8;
+    repeated WifiKeyMgmt key_mgmts = 9;
+    repeated WifiProtocol protocols = 10;
+}
+
+//PID: 230
+message ApkUpdateParamsRequest
+{
+    required string protocol_package_name = 1 [default = "com.xsm.exa.multifunctionmonitoring"];
+    optional string protocol_backup_file = 2 [default = "/mnt/sdcard/Download/multifunctionmonitoring-backup.apk"];
+    optional string protocol_update_file = 3 [default = "/mnt/sdcard/Download/multifunctionmonitoring-new.apk"];
+    required string display_package_name = 4 [default = "com.noodlegate.displaycontroller"];
+    optional string display_backup_file = 5 [default = "/mnt/sdcard/Download/displaycontroller-cecoceco-backup.apk"];
+    optional string display_update_file = 6 [default = "/mnt/sdcard/Download/displaycontroller-cecoceco-new.apk"];
+}
+
+//PID: 231
+message ApkUpdateParamsResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 232
+message RebootMqttClientRequest
+{
+    //This message has no payload
+}
+
+//PID: 233
+message RebootMqttClientResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 234
+message EnableTestModeRequest
+{
+    required bool enable = 1 [default = false];
+}
+
+//PID: 235
+message EnableTestModeResponse
+{
+    optional bool result = 1 [default = true];
+}
+
+//PID: 236
+message SyncLedRequest
+{
+    //This message has no payload
+}
+
+//PID: 237
+message SyncLedResponse
+{
+    optional LedOperationResult result = 1 [default = LO_SUCCESS];
+}
+
+
+enum WifiConnectSate
+{
+    WIFI_STATE_UNKNOWN = 0;
+    WIFI_STATE_ENABLING = 1; //wifi正在打开
+    WIFI_STATE_ENABLED = 2; //wifi已打开
+    WIFI_STATE_DISABLING = 3; //wifi正在关闭
+    WIFI_STATE_DISABLED = 4; //wifi已关闭
+    WIFI_STATE_CONNECTED = 5; //已连接到AP
+    WIFI_STATE_DISCONNECTED = 6; //断开连接
+    WIFI_STATE_BLOCKED = 7; //认证失败
+    WIFI_STATE_SCANNING = 8; //正在扫描中
+    WIFI_STATE_NO_AP = 9; //扫描结束，未找到ap
+    WIFI_STATE_TIMEOUT = 10; //连接ap超时，重新开始扫描
+    WIFI_STATE_CONNECTING = 11; //发现ap热点，正在尝试连接
+    WIFI_STATE_AUTHENTICATING = 12; //正在认证中
+}
+
+//PID: 238
+message WifiConnectStateRequest
+{
+    //This message has no payload
+}
+
+//PID: 239
+message WifiConnectStateResponse
+{
+    required WifiConnectSate status = 1 [default = WIFI_STATE_UNKNOWN];
+    optional string req_ssid = 2 [default = ""];
+    optional string req_password = 3 [default = ""];
+    optional string cur_ssid = 4 [default = ""]; //only at status=WIFI_STATE_CONNECTED
+    optional string cur_mac = 5 [default = ""]; //only at status=WIFI_STATE_CONNECTED
+    optional int32 cur_frequency = 6 [default = 0]; //only at status=WIFI_STATE_CONNECTED(2400~5600)
+    optional string cur_ip_addr = 7 [default = ""]; //only at status=WIFI_STATE_CONNECTED
+}
+
+
+
